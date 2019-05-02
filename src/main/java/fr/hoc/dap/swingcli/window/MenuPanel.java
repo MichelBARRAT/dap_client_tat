@@ -243,6 +243,15 @@ public class MenuPanel extends JPanel implements ActionListener {
         buttonAccount.addActionListener(this);
     }
 
+    /**
+     * Add action listener for refresh.
+     *
+     * @param refreshAllPanel Refresh all panel action
+     */
+    public void registrerRefresh(final Window refreshAllPanel) {
+        buttonRefresh.addActionListener(refreshAllPanel);
+    }
+
     @Override
     public final void actionPerformed(final ActionEvent evt) {
         Object source = evt.getSource();
@@ -254,14 +263,5 @@ public class MenuPanel extends JPanel implements ActionListener {
             @SuppressWarnings("unused")
             Account account = new Account();
         }
-    }
-
-    /**
-     * Add action listener for refresh.
-     *
-     * @param refreshAllPanel Refresh all panel action
-     */
-    public void registrerRefresh(final Window refreshAllPanel) {
-        buttonRefresh.addActionListener(refreshAllPanel);
     }
 }

@@ -205,16 +205,21 @@ package fr.hoc.dap.swingcli.window;
 
 import java.util.prefs.Preferences;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Preferences.
  *
  * @author Michel BARRAT && Thomas TAVERNIER
  */
 public final class Pref {
+    /** Logs. */
+    private static final Logger LOG = LogManager.getLogger("Preferences");
     /** Default user name. */
-    private static final String USER_NAME = "No_user_Name_save";
+    private static final String USER_NAME = "user name";
     /** Default number of next event. */
-    private static final String NUMBER_OF_NEXT_EVENTS = "1";
+    private static final String NUMBER_OF_NEXT_EVENTS = "number of next events";
     /** Preferences. */
     private static final Preferences PREFS = Preferences.userNodeForPackage(Pref.class);
 
@@ -232,6 +237,7 @@ public final class Pref {
      */
     protected static void setUserName(final String userName) {
         PREFS.put(USER_NAME, userName);
+        LOG.error("User name set to: \"" + userName + "\"");
     }
 
     /**
@@ -241,6 +247,7 @@ public final class Pref {
      */
     protected static void setNumberOfNextEvents(final Integer numberOfNextEvents) {
         PREFS.putInt(NUMBER_OF_NEXT_EVENTS, numberOfNextEvents);
+        LOG.error("Number of next events set to: \"" + numberOfNextEvents + "\"");
     }
 
     /**
@@ -249,7 +256,9 @@ public final class Pref {
      * @return user name
      */
     protected static String getUserName() {
-        return PREFS.get(USER_NAME, "No_user_Name_save");
+        String userName = PREFS.get(USER_NAME, "No_user_Name_save");
+        LOG.error("User name get: \"" + userName + "\"");
+        return userName;
     }
 
     /**
@@ -258,6 +267,8 @@ public final class Pref {
      * @return number of next event
      */
     protected static Integer getNumberOfNextEvents() {
-        return PREFS.getInt(NUMBER_OF_NEXT_EVENTS, 1);
+        Integer numberOfNextEvents = PREFS.getInt(NUMBER_OF_NEXT_EVENTS, 1);
+        LOG.error("Number of next events get: \"" + numberOfNextEvents + "\"");
+        return numberOfNextEvents;
     }
 }

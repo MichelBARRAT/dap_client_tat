@@ -289,9 +289,9 @@ public final class DataServer {
         try {
             account = new URI(URL + "/account/add/" + userKey);
             browser.browse(account);
-            LOG.error("error creating URL for userkey \"" + userKey + "\"");
+            LOG.error("succes creating URL for userkey \"" + userKey + "\"");
         } catch (URISyntaxException | IOException e) {
-            LOG.error("succes creating URL for userkey \"" + userKey + "\"", e);
+            LOG.error("error creating URL for userkey \"" + userKey + "\"", e);
         }
     }
 
@@ -306,9 +306,9 @@ public final class DataServer {
         LOG.error("try to create URL for retrieving number of unread email for userKey \"" + userKey + "\"");
         try {
             url = new URL(URL + "/email/nbunread?userKey=" + userKey);
-            LOG.error("error creating URL for userkey \"" + userKey + "\"");
+            LOG.error("succes creating URL for userkey \"" + userKey + "\"");
         } catch (MalformedURLException e) {
-            LOG.error("succes creating URL for userkey \"" + userKey + "\"", e);
+            LOG.error("error creating URL for userkey \"" + userKey + "\"", e);
         }
         return loadDataSafe(url);
     }
@@ -325,9 +325,9 @@ public final class DataServer {
         LOG.error("try to create URL for retrieving the list of next events for userKey \"" + userKey + "\"");
         try {
             url = new URL(URL + "/event/next?userKey=" + userKey + "&nb=" + nb);
-            LOG.error("error creating URL for userkey \"" + userKey + "\"");
+            LOG.error("succes creating URL for userkey \"" + userKey + "\"");
         } catch (MalformedURLException e) {
-            LOG.error("succes creating URL for userkey \"" + userKey + "\"", e);
+            LOG.error("error creating URL for userkey \"" + userKey + "\"", e);
         }
         return loadDataSafe(url);
     }
@@ -343,9 +343,9 @@ public final class DataServer {
         LOG.error("try to create URL for testing existence for userKey \"" + userKey + "\"");
         try {
             url = new URL(URL + "/account/exist?userKey=" + userKey);
-            LOG.error("error creating URL for userkey \"" + userKey + "\"");
+            LOG.error("succes creating URL for userkey \"" + userKey + "\"");
         } catch (MalformedURLException e) {
-            LOG.error("succes creating URL for userkey \"" + userKey + "\"", e);
+            LOG.error("error creating URL for userkey \"" + userKey + "\"", e);
         }
         return Boolean.valueOf(loadDataSafe(url));
     }

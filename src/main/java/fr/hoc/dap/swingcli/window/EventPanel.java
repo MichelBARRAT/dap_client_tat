@@ -208,10 +208,7 @@ import java.awt.GridLayout;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -231,8 +228,6 @@ public class EventPanel extends JPanel {
     private static final long serialVersionUID = 620111944926408112L;
     /** Default dimension size. */
     private static final Integer DIMENSION_SIZE = 25;
-    /** Default substring adjustment. */
-    private static final Integer SUBSTRING_ADJUSTEMENT = 3;
     /** Default length if date is with hours. */
     private static final Integer LENGTH_IF_HOURS = 12;
 
@@ -242,12 +237,19 @@ public class EventPanel extends JPanel {
     private JList<String> eventList;
     /** Text field to choose the number of next events to display. */
     private JTextField nbOfEvents;
-    /** List of events to display. */
-    private ArrayList<String> eventsList;
     /** Display the list of next events. */
     private JPanel textPanel;
     /** numberOfEvents. */
     private Integer numberOfEvents;
+
+    /** TODO JavaDoc. */
+    private DateFormat dateformatWihtouHours = new SimpleDateFormat("yyyy-MM-dd");
+    /** TODO JavaDoc. */
+    private SimpleDateFormat formatterWihtouHours = new SimpleDateFormat("EEEE dd MMMM yyyy");
+    /** TODO JavaDoc. */
+    private DateFormat dateformatWihtHours = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
+    /** TODO JavaDoc. */
+    private SimpleDateFormat formatterWihtHours = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
 
     /**
      * Constructor build event panel.
@@ -255,12 +257,11 @@ public class EventPanel extends JPanel {
      * @throws Exception All problems
      */
     public EventPanel() throws Exception {
-        eventsList = new ArrayList<String>();
         listModel = new DefaultListModel<String>();
         eventList = new JList<String>();
         setNbOfEvents(new JTextField());
         eventList.setModel(listModel);
-        nbOfEvents.setText(String.valueOf(1));
+        nbOfEvents.setText(String.valueOf(Pref.getNumberOfNextEvents()));
         nbOfEvents.setPreferredSize(new Dimension(DIMENSION_SIZE, DIMENSION_SIZE));
         textPanel = new JPanel();
         textPanel.add(new JLabel("Vos "));
@@ -275,45 +276,29 @@ public class EventPanel extends JPanel {
      * Refresh event panel data.
      */
     public void refreshPanel() {
-        eventsList.clear();
         listModel.clear();
         String events;
+        String[] eventsList;
+
         events = DataServer.retrieveNextEvents(Pref.getUserName(), Pref.getNumberOfNextEvents());
         events = events.substring(2, events.length() - 2);
-        Pattern eventSeparatorPattern = Pattern.compile("\",\"");
-        Matcher eventSeparatorMatcher = eventSeparatorPattern.matcher(events);
-        Integer nomberOfEvents = 1;
-        while (eventSeparatorMatcher.find()) {
-            nomberOfEvents += 1;
-        }
-        for (Integer eventNumber = 0; eventNumber < nomberOfEvents; eventNumber++) {
-            if (nomberOfEvents == 1) {
-                eventsList.add(events);
-                break;
-            }
-            if (eventNumber == nomberOfEvents - 1) {
-                eventsList.add(events);
-                break;
-            }
-            eventsList.add(events.substring(0, events.indexOf("\",\"")));
-            events = events.substring(events.indexOf("\",\"") + SUBSTRING_ADJUSTEMENT);
-        }
-        numberOfEvents = eventsList.size();
+        eventsList = events.split("\",\"");
+        numberOfEvents = eventsList.length;
+
         for (String eachEvent : eventsList) {
             try {
-                String event = eachEvent.substring(0, eachEvent.lastIndexOf(" "));
-                String date = eachEvent.substring(eachEvent.lastIndexOf(" "));
-                DateFormat dateformat;
-                SimpleDateFormat formatter;
+                String event;
+                String date;
+                Date dateTemp;
+                event = eachEvent.substring(0, eachEvent.lastIndexOf(" "));
+                date = eachEvent.substring(eachEvent.lastIndexOf(" "));
                 if (date.length() < LENGTH_IF_HOURS) {
-                    dateformat = new SimpleDateFormat("yyyy-MM-dd");
-                    formatter = new SimpleDateFormat("EEEE dd MMMM yyyy");
+                    dateTemp = dateformatWihtouHours.parse(date);
+                    date = formatterWihtouHours.format(dateTemp);
                 } else {
-                    dateformat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
-                    formatter = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
+                    dateTemp = dateformatWihtHours.parse(date);
+                    date = formatterWihtHours.format(dateTemp);
                 }
-                Date date2 = dateformat.parse(date);
-                date = formatter.format(date2);
                 listModel.addElement(event + " le " + date);
             } catch (StringIndexOutOfBoundsException e) {
                 listModel.addElement("error");

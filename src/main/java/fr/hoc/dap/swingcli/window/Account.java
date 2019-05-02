@@ -212,6 +212,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import fr.hoc.dap.swingcli.DataServer;
@@ -231,10 +232,14 @@ public class Account extends JFrame implements ActionListener, KeyListener {
     /** Default window size Y. */
     private static final Integer WINDOW_SIZE_Y = 125;
 
-    /** Button for creating a new account. */
+    /** Button for adding a new account. */
     private JButton buttonConnection;
+    /** Button for creating a new account. */
+    private JButton buttonNewAccount;
     /** Text field for entering an account. */
     private JTextField textArea;
+    /** Panel of buttons. */
+    private JPanel buttons;
 
     /**
      * Close window new account.
@@ -249,16 +254,22 @@ public class Account extends JFrame implements ActionListener, KeyListener {
     public Account() {
         textArea = new JTextField();
         buttonConnection = new JButton("Connection");
+        buttonNewAccount = new JButton("new account");
         Font police = new Font("Arial", Font.BOLD, FONT_SIZE);
         textArea.setFont(police);
         textArea.addKeyListener(this);
+        buttons = new JPanel();
+        buttons.setLayout(new GridLayout(1, 2));
+        buttons.add(buttonConnection);
+        buttons.add(buttonNewAccount);
         buttonConnection.addActionListener(this);
+        buttonNewAccount.addActionListener(this);
         this.setSize(WINDOW_SIZE_X, WINDOW_SIZE_Y);
         this.setLayout(new GridLayout(2, 1));
         this.setLocationRelativeTo(null);
         this.setTitle("Ajoutez un utilisateur");
         this.add(textArea);
-        this.add(buttonConnection);
+        this.add(buttons);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
@@ -266,13 +277,21 @@ public class Account extends JFrame implements ActionListener, KeyListener {
     @Override
     public final void actionPerformed(final ActionEvent evt) {
         Object source = evt.getSource();
-        if (source == buttonConnection) {
-            String userKey = textArea.getText();
-            if (!DataServer.doesAccountExist(userKey)) {
+        if (source == buttonNewAccount) {
+            String userKey = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (!DataServer.doesGoogleAccountExist(userKey)) {
                 closeAccount();
                 DataServer.newAccount(userKey);
             } else {
                 textArea.setText("Utlisateur déja enregistré !");
+            }
+        } else if (source == buttonConnection) {
+            String userKey = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (DataServer.doesGoogleAccountExist(userKey)) {
+                closeAccount();
+                DataServer.setAccount(userKey, Pref.getUserName());
+            } else {
+                textArea.setText("Utlisateur non existant !");
             }
         }
     }
@@ -284,12 +303,12 @@ public class Account extends JFrame implements ActionListener, KeyListener {
     @Override
     public final void keyPressed(final KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            String userKey = textArea.getText();
-            if (!DataServer.doesAccountExist(userKey)) {
+            String userKey = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (DataServer.doesGoogleAccountExist(userKey)) {
                 closeAccount();
-                DataServer.newAccount(userKey);
+                DataServer.setAccount(userKey, Pref.getUserName());
             } else {
-                textArea.setText("Utlisateur déja enregistré !");
+                textArea.setText("Utlisateur non existant !");
             }
         }
     }

@@ -212,6 +212,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import fr.hoc.dap.swingcli.DataServer;
@@ -236,7 +237,11 @@ public class Options extends JFrame implements ActionListener, KeyListener {
     /** Text field for enter an account. */
     private JTextField textArea;
     /** Button refresh. */
-    private JButton buttonRefresh2;
+    private JButton buttonRefresh;
+    /** Panel of buttons. */
+    private JPanel buttons;
+    /** Button for creating a new user. */
+    private JButton buttonNewUser;
 
     /**
      * Close window option.
@@ -251,41 +256,56 @@ public class Options extends JFrame implements ActionListener, KeyListener {
     public Options() {
         textArea = new JTextField();
         buttonConnection = new JButton("Connexion");
+        buttonNewUser = new JButton("New User");
         Font police = new Font("Arial", Font.BOLD, FONT_SIZE);
         textArea.setFont(police);
+        buttons = new JPanel();
+        buttons.setLayout(new GridLayout(1, 2));
+        buttons.add(buttonConnection);
+        buttons.add(buttonNewUser);
         this.setSize(WINDOW_SIZE_X, WINDOW_SIZE_Y);
         this.setLayout(new GridLayout(2, 1));
         this.setLocationRelativeTo(null);
-        this.setTitle("Changer d'utilisateur");
+        this.setTitle("Options");
         this.add(textArea);
-        this.add(buttonConnection);
+        this.add(buttons);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
         textArea.addKeyListener(this);
         buttonConnection.addActionListener(this);
+        buttonNewUser.addActionListener(this);
     }
 
     /**
      * Set Refresh button.
      *
-     * @param buttonRefresh Refresh button
+     * @param newButtonRefresh Refresh button
      */
-    public void setRefresh(final JButton buttonRefresh) {
-        this.buttonRefresh2 = buttonRefresh;
+    public void setRefresh(final JButton newButtonRefresh) {
+        this.buttonRefresh = newButtonRefresh;
     }
 
     @Override
     public final void actionPerformed(final ActionEvent evt) {
-        String userKey;
+        String loginName;
         Object source = evt.getSource();
         if (source == buttonConnection) {
-            userKey = textArea.getText();
-            if (DataServer.doesAccountExist(userKey)) {
+            loginName = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (DataServer.doesDapAccountExist(loginName)) {
                 closeOption();
-                Pref.setUserName(userKey);
-                buttonRefresh2.doClick();
+                Pref.setUserName(loginName);
+                buttonRefresh.doClick();
             } else {
-                textArea.setText("Utilisateur invalide !");
+                textArea.setText("User doesn't exist");
+            }
+        } else if (source == buttonNewUser) {
+            loginName = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (!DataServer.doesDapAccountExist(loginName)) {
+                closeOption();
+                Pref.setUserName(loginName);
+                DataServer.newDapAccount(loginName);
+            } else {
+                textArea.setText("User already exist");
             }
         }
     }
@@ -297,11 +317,11 @@ public class Options extends JFrame implements ActionListener, KeyListener {
     @Override
     public final void keyPressed(final KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            String userKey = textArea.getText();
-            if (DataServer.doesAccountExist(userKey)) {
+            String userKey = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (DataServer.doesGoogleAccountExist(userKey)) {
                 closeOption();
                 Pref.setUserName(userKey);
-                buttonRefresh2.doClick();
+                buttonRefresh.doClick();
             } else {
                 textArea.setText("Utilisateur invalide !");
             }

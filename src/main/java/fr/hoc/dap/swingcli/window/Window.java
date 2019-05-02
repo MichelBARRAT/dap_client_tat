@@ -209,13 +209,15 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 
+import fr.hoc.dap.swingcli.DataServer;
+
 /**
  * Display window interface.
  *
  * @author Michel BARRAT && Thomas TAVERNIER
  */
 public class Window extends JFrame implements ActionListener {
-    /** serialVersionUID . */
+    /** serialVersionUID. */
     private static final long serialVersionUID = 6212387842969434386L;
     /** Default window size X. */
     private static final Integer WINDOW_SIZE_X = 650;
@@ -259,7 +261,7 @@ public class Window extends JFrame implements ActionListener {
      * Set the window size.
      */
     private void setWindowSize() {
-        this.setSize(WINDOW_SIZE_X, WINDOW_SIZE_Y + RATIO * eventPanel.getNumberOfEvents());
+        this.setSize(WINDOW_SIZE_X, WINDOW_SIZE_Y + RATIO * DataServer.getNumberOfEvents());
     }
 
     /**
@@ -267,9 +269,14 @@ public class Window extends JFrame implements ActionListener {
      */
     private void refreshAllPanel() {
         Pref.setNumberOfNextEvents(Integer.valueOf(eventPanel.getNbOfEvents().getText()));
-        eventPanel.refreshPanel();
-        emailPanel.refreshPanel();
         welcomePanel.refreshPanel();
+        if (DataServer.ping()) {
+            eventPanel.refreshPanel();
+            emailPanel.refreshPanel();
+        } else {
+            eventPanel.error();
+            emailPanel.error();
+        }
         this.setWindowSize();
     }
 

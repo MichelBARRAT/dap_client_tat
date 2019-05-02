@@ -241,7 +241,14 @@ public class EmailPanel extends JPanel {
      * Refresh email panel data.
      */
     public void refreshPanel() {
-        nbUnread = DataServer.retrieveNbUnreadEmails(Pref.getUserName());
+        nbUnread = DataServer.retrieveTotalNbUnreadEmails(Pref.getUserName()).toString();
         displayNbUnreadEmail.setText(nbUnread);
+    }
+
+    /**
+     * Set text as "error".
+     */
+    public void error() {
+        displayNbUnreadEmail.setText("error");
     }
 }

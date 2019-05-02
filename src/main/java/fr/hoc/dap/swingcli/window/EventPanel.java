@@ -205,10 +205,6 @@ package fr.hoc.dap.swingcli.window;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -228,17 +224,7 @@ public class EventPanel extends JPanel {
     private static final long serialVersionUID = 620111944926408112L;
     /** Default dimension size. */
     private static final Integer DIMENSION_SIZE = 25;
-    /** Default length if date is with hours. */
-    private static final Integer LENGTH_IF_HOURS = 12;
 
-    /** Date format wihtout hours. */
-    private DateFormat dateformatWihtouHours = new SimpleDateFormat("yyyy-MM-dd");
-    /** Simple date format wihtout hours. */
-    private SimpleDateFormat formatterWihtouHours = new SimpleDateFormat("EEEE dd MMMM yyyy");
-    /** Date format wiht hours. */
-    private DateFormat dateformatWihtHours = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
-    /** Simple date format wiht hours. */
-    private SimpleDateFormat formatterWihtHours = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
     /** Model of event list. */
     private DefaultListModel<String> listModel;
     /** Event list. */
@@ -276,35 +262,17 @@ public class EventPanel extends JPanel {
      */
     public void refreshPanel() {
         listModel.clear();
-        String events;
-        String[] eventsList;
-
-        events = DataServer.retrieveNextEvents(Pref.getUserName(), Pref.getNumberOfNextEvents());
-        events = events.substring(2, events.length() - 2);
-        eventsList = events.split("\",\"");
-        numberOfEvents = eventsList.length;
-
-        for (String eachEvent : eventsList) {
-            try {
-                String event;
-                String date;
-                Date dateTemp;
-                event = eachEvent.substring(0, eachEvent.lastIndexOf(" "));
-                date = eachEvent.substring(eachEvent.lastIndexOf(" "));
-                if (date.length() < LENGTH_IF_HOURS) {
-                    dateTemp = dateformatWihtouHours.parse(date);
-                    date = formatterWihtouHours.format(dateTemp);
-                } else {
-                    dateTemp = dateformatWihtHours.parse(date);
-                    date = formatterWihtHours.format(dateTemp);
-                }
-                listModel.addElement(event + " le " + date);
-            } catch (StringIndexOutOfBoundsException e) {
-                listModel.addElement("error");
-            } catch (ParseException e) {
-                listModel.addElement(eachEvent);
-            }
+        for (String x : DataServer.retrieveTotalNextEvents(Pref.getUserName(), Pref.getNumberOfNextEvents())) {
+            listModel.addElement(x);
         }
+    }
+
+    /**
+     * Set text as "error".
+     */
+    public void error() {
+        listModel.clear();
+        listModel.addElement("error");
     }
 
     /**

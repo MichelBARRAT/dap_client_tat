@@ -231,6 +231,14 @@ public class EventPanel extends JPanel {
     /** Default length if date is with hours. */
     private static final Integer LENGTH_IF_HOURS = 12;
 
+    /** Date format wihtout hours. */
+    private DateFormat dateformatWihtouHours = new SimpleDateFormat("yyyy-MM-dd");
+    /** Simple date format wihtout hours. */
+    private SimpleDateFormat formatterWihtouHours = new SimpleDateFormat("EEEE dd MMMM yyyy");
+    /** Date format wiht hours. */
+    private DateFormat dateformatWihtHours = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
+    /** Simple date format wiht hours. */
+    private SimpleDateFormat formatterWihtHours = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
     /** Model of event list. */
     private DefaultListModel<String> listModel;
     /** Event list. */
@@ -241,15 +249,6 @@ public class EventPanel extends JPanel {
     private JPanel textPanel;
     /** numberOfEvents. */
     private Integer numberOfEvents;
-
-    /** TODO JavaDoc. */
-    private DateFormat dateformatWihtouHours = new SimpleDateFormat("yyyy-MM-dd");
-    /** TODO JavaDoc. */
-    private SimpleDateFormat formatterWihtouHours = new SimpleDateFormat("EEEE dd MMMM yyyy");
-    /** TODO JavaDoc. */
-    private DateFormat dateformatWihtHours = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
-    /** TODO JavaDoc. */
-    private SimpleDateFormat formatterWihtHours = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
 
     /**
      * Constructor build event panel.

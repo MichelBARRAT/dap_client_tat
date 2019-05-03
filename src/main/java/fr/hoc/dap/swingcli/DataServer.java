@@ -322,17 +322,17 @@ public final class DataServer {
      */
     public static String retrieveTotalNbUnreadEmails(final String loginName) {
         String response = "error";
-        String nbEmailStrin;
+        String nbEmailString;
         Integer nbEmails;
         Integer totalNbEmails = 0;
-        String[] y = retrieveUserKey(loginName);
-        if (y == null) {
+        String[] userKeyList = retrieveUserKey(loginName);
+        if (userKeyList == null) {
             return response;
         }
-        for (String z : y) {
-            nbEmailStrin = retrieveNbUnreadEmails(z);
-            if (nbEmailStrin != "error") {
-                nbEmails = Integer.valueOf(nbEmailStrin);
+        for (String userKey : userKeyList) {
+            nbEmailString = retrieveNbUnreadEmails(userKey);
+            if (nbEmailString != "error") {
+                nbEmails = Integer.valueOf(nbEmailString);
                 totalNbEmails += nbEmails;
             }
         }
@@ -367,35 +367,36 @@ public final class DataServer {
     @SuppressWarnings("unchecked")
     public static List<String> retrieveTotalNextEvents(final String loginName, final Integer nb) {
         List<String> response = new ArrayList<String>();
-        HashMap<String, Object> result = null;
+        HashMap<String, Object> eventsMap = null;
         LinkedList<Date> dateTotalList = new LinkedList<Date>();
         LinkedList<String> textTotalList = new LinkedList<String>();
         List<Date> dateList = new ArrayList<Date>();
         List<String> textList = new ArrayList<String>();
-        String[] y = retrieveUserKey(loginName);
-        if (y == null) {
+        String[] userKeyList = retrieveUserKey(loginName);
+        if (userKeyList == null) {
             return response;
         }
-        for (String z : y) {
-            result = retrieveNextEvents(z, nb);
-            dateList = (List<Date>) result.get("dateList");
-            textList = (List<String>) result.get("textList");
-            for (Integer i = 0; i < dateList.size(); i++) {
-                for (Integer j = 0; j <= dateTotalList.size(); j++) {
-                    if (j == dateTotalList.size() || dateTotalList.get(j).compareTo(dateList.get(i)) > 0) {
-                        dateTotalList.add(j, dateList.get(i));
-                        textTotalList.add(j, textList.get(i));
+        for (String userKey : userKeyList) {
+            eventsMap = retrieveNextEvents(userKey, nb);
+            dateList = (List<Date>) eventsMap.get("dateList");
+            textList = (List<String>) eventsMap.get("textList");
+            for (Integer listIndex = 0; listIndex < dateList.size(); listIndex++) {
+                for (Integer totalListIndex = 0; totalListIndex <= dateTotalList.size(); totalListIndex++) {
+                    if (totalListIndex == dateTotalList.size()
+                            || dateTotalList.get(totalListIndex).compareTo(dateList.get(listIndex)) > 0) {
+                        dateTotalList.add(totalListIndex, dateList.get(listIndex));
+                        textTotalList.add(totalListIndex, textList.get(listIndex));
                         break;
                     }
                 }
             }
         }
-        for (Integer i = 0; i < dateTotalList.size(); i++) {
-            if (i == nb) {
+        for (Integer totalListIndex = 0; totalListIndex < dateTotalList.size(); totalListIndex++) {
+            if (totalListIndex == nb) {
                 break;
             }
-            Date date = dateTotalList.get(i);
-            String text = textTotalList.get(i);
+            Date date = dateTotalList.get(totalListIndex);
+            String text = textTotalList.get(totalListIndex);
             if (text.equals("null")) {
                 text = "(Sans titre)";
             }
@@ -474,10 +475,10 @@ public final class DataServer {
             LOG.error("error creating URL for retrieving the userKey for loginName \"" + loginName + "\"", e);
             return response;
         }
-        String x = loadDataSafe(url);
-        if (x.length() > 2) {
-            x = x.substring(2, x.length() - 2);
-            response = x.split("\",\"");
+        String userKeyListString = loadDataSafe(url);
+        if (userKeyListString.length() > 2) {
+            userKeyListString = userKeyListString.substring(2, userKeyListString.length() - 2);
+            response = userKeyListString.split("\",\"");
         }
         return response;
     }

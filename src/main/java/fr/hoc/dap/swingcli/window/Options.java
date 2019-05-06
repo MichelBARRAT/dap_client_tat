@@ -317,10 +317,10 @@ public class Options extends JFrame implements ActionListener, KeyListener {
     @Override
     public final void keyPressed(final KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            String userKey = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
-            if (DataServer.doesGoogleAccountExist(userKey)) {
+            String loginName = textArea.getText().replaceAll("[^A-Za-z0-9]", "");
+            if (DataServer.doesDapAccountExist(loginName)) {
                 closeOption();
-                Pref.setUserName(userKey);
+                Pref.setUserName(loginName);
                 buttonRefresh.doClick();
             } else {
                 textArea.setText("Utilisateur invalide !");

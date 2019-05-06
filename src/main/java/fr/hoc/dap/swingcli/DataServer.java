@@ -212,14 +212,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -236,16 +228,6 @@ public final class DataServer {
     private static final String URL = "http://localhost:8080";
     /** Default response time for query. */
     private static final int REPONSE_TIME = 15000;
-    /** Default length if date is with hours. */
-    private static final Integer LENGTH_IF_HOURS = 12;
-    /** Date format wihtout hours. */
-    private static final DateFormat DATE_FORMAT_WITHOUT_HOURS = new SimpleDateFormat("yyyy-MM-dd");
-    /** Simple date format wihtout hours. */
-    private static final SimpleDateFormat FORMATATTER_WITHOUT_HOURS = new SimpleDateFormat("EEEE dd MMMM yyyy");
-    /** Date format wiht hours. */
-    private static final DateFormat DATE_FORMAT_WITH_HOURS = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSX");
-    /** Simple date format wiht hours. */
-    private static final SimpleDateFormat FORMATATTER_WITH_HOURS = new SimpleDateFormat("EEEE dd MMMM yyyy à hh:mm");
 
     /** number of events displaying. */
     private static Integer numberOfEvents = 0;
@@ -260,16 +242,23 @@ public final class DataServer {
     /**
      * Load data with try/catch exception.
      *
-     * @param myurl URL to load from
+     * @param urlEnd URL to load from
      * @return Data without exception
      */
-    public static String loadDataSafe(final URL myurl) {
+    public static String loadDataSafe(final String urlEnd) {
+        URL url = null;
         String data = "error";
         try {
-            data = loadData(myurl);
-            LOG.error("succes retrieving data from \"" + myurl + "\"");
+            url = new URL(URL + urlEnd);
+            LOG.error("succes creating URL: " + URL + urlEnd);
+        } catch (MalformedURLException e) {
+            LOG.error("error creating URL: \" + URL + urlEnd: ", e);
+        }
+        try {
+            data = loadData(url);
+            LOG.error("succes retrieving data from \"" + url + "\"");
         } catch (IOException e) {
-            LOG.error("error trying to retrieve data from \"" + myurl + "\"", e);
+            LOG.error("error trying to retrieve data from \"" + url + "\": ", e);
         }
         return data;
     }
@@ -315,172 +304,13 @@ public final class DataServer {
     }
 
     /**
-     * Retrieve total number of unread email.
+     * Check if dap user exist.
      *
      * @param loginName loginName to check
-     * @return number total of unread email
+     * @return true if loginName exist
      */
-    public static String retrieveTotalNbUnreadEmails(final String loginName) {
-        String response = "error";
-        String nbEmailString;
-        Integer nbEmails;
-        Integer totalNbEmails = 0;
-        String[] userKeyList = retrieveUserKey(loginName);
-        if (userKeyList == null) {
-            return response;
-        }
-        for (String userKey : userKeyList) {
-            nbEmailString = retrieveNbUnreadEmails(userKey);
-            if (nbEmailString != "error") {
-                nbEmails = Integer.valueOf(nbEmailString);
-                totalNbEmails += nbEmails;
-            }
-        }
-        response = totalNbEmails.toString();
-        return response;
-    }
-
-    /**
-     * Retrieve number of unread email.
-     *
-     * @param userKey userKey to check
-     * @return number of unread email
-     */
-    public static String retrieveNbUnreadEmails(final String userKey) {
-        URL url = null;
-        try {
-            url = new URL(URL + "/email/nbunread?userKey=" + userKey);
-            LOG.error("succes creating URL for retrieving number of unread email for userkey \"" + userKey + "\"");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for retrieving number of unread email for userkey \"" + userKey + "\"", e);
-        }
-        return loadDataSafe(url);
-    }
-
-    /**
-     * Retrieve total next events.
-     *
-     * @param loginName loginName to check
-     * @param nb        number of event to retrieve
-     * @return total next events
-     */
-    @SuppressWarnings("unchecked")
-    public static List<String> retrieveTotalNextEvents(final String loginName, final Integer nb) {
-        List<String> response = new ArrayList<String>();
-        HashMap<String, Object> eventsMap = null;
-        LinkedList<Date> dateTotalList = new LinkedList<Date>();
-        LinkedList<String> textTotalList = new LinkedList<String>();
-        List<Date> dateList = new ArrayList<Date>();
-        List<String> textList = new ArrayList<String>();
-        String[] userKeyList = retrieveUserKey(loginName);
-        if (userKeyList == null) {
-            return response;
-        }
-        for (String userKey : userKeyList) {
-            eventsMap = retrieveNextEvents(userKey, nb);
-            dateList = (List<Date>) eventsMap.get("dateList");
-            textList = (List<String>) eventsMap.get("textList");
-            for (Integer listIndex = 0; listIndex < dateList.size(); listIndex++) {
-                for (Integer totalListIndex = 0; totalListIndex <= dateTotalList.size(); totalListIndex++) {
-                    if (totalListIndex == dateTotalList.size()
-                            || dateTotalList.get(totalListIndex).compareTo(dateList.get(listIndex)) > 0) {
-                        dateTotalList.add(totalListIndex, dateList.get(listIndex));
-                        textTotalList.add(totalListIndex, textList.get(listIndex));
-                        break;
-                    }
-                }
-            }
-        }
-        for (Integer totalListIndex = 0; totalListIndex < dateTotalList.size(); totalListIndex++) {
-            if (totalListIndex == nb) {
-                break;
-            }
-            Date date = dateTotalList.get(totalListIndex);
-            String text = textTotalList.get(totalListIndex);
-            if (text.equals("null")) {
-                text = "(Sans titre)";
-            }
-            if (date.toString().length() < LENGTH_IF_HOURS) {
-                response.add(text + " le " + FORMATATTER_WITHOUT_HOURS.format(date));
-            } else {
-                response.add(text + " le " + FORMATATTER_WITH_HOURS.format(date));
-            }
-        }
-        numberOfEvents = response.size();
-        return response;
-    }
-
-    /**
-     * Retrieve next events.
-     *
-     * @param userKey userKey to check
-     * @param nb      number of event to retrieve
-     * @return next events
-     */
-    public static HashMap<String, Object> retrieveNextEvents(final String userKey, final Integer nb) {
-        List<Date> dateList = new ArrayList<Date>();
-        List<String> textList = new ArrayList<String>();
-        HashMap<String, Object> response = new HashMap<String, Object>();
-        response.put("dateList", dateList);
-        response.put("textList", textList);
-        String events;
-        String[] eventsList;
-        URL url = null;
-        try {
-            url = new URL(URL + "/event/next?userKey=" + userKey + "&nb=" + nb);
-            LOG.error("succes creating URL for retrieving the list of next events for userkey \"" + userKey + "\"");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for retrieving the list of next events for userkey \"" + userKey + "\"", e);
-            return response;
-        }
-        events = loadDataSafe(url);
-        events = events.substring(2, events.length() - 2);
-        eventsList = events.split("\",\"");
-        for (String eachEvent : eventsList) {
-            try {
-                String event;
-                String dateString;
-                Date date;
-                event = eachEvent.substring(0, eachEvent.lastIndexOf(" "));
-                dateString = eachEvent.substring(eachEvent.lastIndexOf(" "));
-                if (dateString.length() < LENGTH_IF_HOURS) {
-                    date = DATE_FORMAT_WITHOUT_HOURS.parse(dateString);
-                } else {
-                    date = DATE_FORMAT_WITH_HOURS.parse(dateString);
-                }
-                dateList.add(date);
-                textList.add(event);
-            } catch (ParseException e) {
-                LOG.error("parse date error ", e);
-            } catch (StringIndexOutOfBoundsException e) {
-                LOG.error("substring error ", e);
-            }
-        }
-        return response;
-    }
-
-    /**
-     * Retrieve userKey.
-     *
-     * @param loginName loginName to check
-     * @return userKey list
-     */
-    private static String[] retrieveUserKey(final String loginName) {
-        String[] response = null;
-        URL url = null;
-        try {
-            url = new URL(URL + "/dap/getListOfGoogleAccounts?loginName=" + loginName);
-            LOG.error("succes creating URL for retrieving the userKey for loginName \"" + loginName + "\"");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for retrieving the userKey for loginName \"" + loginName + "\"", e);
-            return response;
-        }
-        String userKeyListString = loadDataSafe(url);
-        if (userKeyListString.length() > 2) {
-            userKeyListString = userKeyListString.substring(2, userKeyListString.length() - 2);
-            response = userKeyListString.split("\",\"");
-        }
-        return response;
+    public static boolean doesDapAccountExist(final String loginName) {
+        return Boolean.valueOf(loadDataSafe("/dap/account/exist?loginName=" + loginName));
     }
 
     /**
@@ -490,23 +320,7 @@ public final class DataServer {
      * @return true if userKey exist
      */
     public static Boolean doesGoogleAccountExist(final String userKey) {
-        URL url = null;
-        try {
-            url = new URL(URL + "/account/exist?userKey=" + userKey);
-            LOG.error("succes creating URL for testing existence for userkey \"" + userKey + "\"");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for testing existence for userkey \"" + userKey + "\"", e);
-        }
-        return Boolean.valueOf(loadDataSafe(url));
-    }
-
-    /**
-     * Get number of events displaying.
-     *
-     * @return number of events displaying
-     */
-    public static Integer getNumberOfEvents() {
-        return numberOfEvents;
+        return Boolean.valueOf(loadDataSafe("/account/exist?userKey=" + userKey));
     }
 
     /**
@@ -515,31 +329,34 @@ public final class DataServer {
      * @return yes if reachable
      */
     public static boolean ping() {
-        URL url = null;
-        try {
-            url = new URL(URL + "/ping");
-            LOG.error("succes creating URL for ping");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for ping", e);
-        }
-        return Boolean.valueOf(loadDataSafe(url));
+        return Boolean.valueOf(loadDataSafe("/ping"));
     }
 
     /**
-     * Check if dap user exist.
+     * Retrieve number of unread email.
+     *
+     * @param loginName userKey to check
+     * @return number of unread email
+     */
+    public static String retrieveNbUnreadEmails(final String loginName) {
+        return loadDataSafe("/email/allnbunread?loginName=" + loginName);
+    }
+
+    /**
+     * Retrieve next events.
      *
      * @param loginName loginName to check
-     * @return true if loginName exist
+     * @param nb        number of event to retrieve
+     * @return next events
      */
-    public static boolean doesDapAccountExist(final String loginName) {
-        URL url = null;
-        try {
-            url = new URL(URL + "/dap/account/exist?loginName=" + loginName);
-            LOG.error("error creating URL for testing existence for loginName \"" + loginName + "\"");
-        } catch (MalformedURLException e) {
-            LOG.error("error creating URL for testing existence for loginName \"" + loginName + "\"", e);
-        }
-        return Boolean.valueOf(loadDataSafe(url));
+    public static String[] retrieveNextEvents(final String loginName, final Integer nb) {
+        String events;
+        String[] eventsList;
+        events = loadDataSafe("/allevent/next?loginName=" + loginName + "&nb=" + nb);
+        events = events.substring(2, events.length() - 2);
+        eventsList = events.split("\",\"");
+        numberOfEvents = eventsList.length;
+        return eventsList;
     }
 
     /**
@@ -548,14 +365,7 @@ public final class DataServer {
      * @param loginName loginName to create
      */
     public static void newDapAccount(final String loginName) {
-        URL url;
-        try {
-            url = new URL(URL + "/dap/createUser?loginName=" + loginName);
-            loadDataSafe(url);
-            LOG.error("error creating URL for adding account for loginName \"" + loginName + "\"");
-        } catch (IOException e) {
-            LOG.error("error creating URL for adding account for loginName \"" + loginName + "\"", e);
-        }
+        loadDataSafe("/dap/createUser?loginName=" + loginName);
     }
 
     /**
@@ -565,15 +375,15 @@ public final class DataServer {
      * @param loginName of dap account
      */
     public static void setAccount(final String userKey, final String loginName) {
-        URL account;
-        try {
-            account = new URL(URL + "/dap/add/" + userKey + "?loginName=" + loginName);
-            loadDataSafe(account);
-            LOG.error(
-                    "succes creating URL for setting userkey \"" + userKey + "\" for loginName \"" + loginName + "\"");
-        } catch (IOException e) {
-            LOG.error("succes creating URL for setting userkey \"" + userKey + "\" for loginName \"" + loginName + "\"",
-                    e);
-        }
+        loadDataSafe("/dap/add/" + userKey + "?loginName=" + loginName);
+    }
+
+    /**
+     * Get number of events displaying.
+     *
+     * @return number of events displaying
+     */
+    public static Integer getNumberOfEvents() {
+        return numberOfEvents;
     }
 }

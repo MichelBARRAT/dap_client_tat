@@ -248,6 +248,7 @@ public class EmailPanel extends JPanel {
     /**
      * Set text as "error".
      */
+    //TODO bam by Djer |POO| "displayError" serait mieux ?
     public void error() {
         displayNbUnreadEmail.setText("error");
     }

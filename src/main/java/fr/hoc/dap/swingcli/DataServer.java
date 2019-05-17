@@ -217,6 +217,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * //TODO bam by Djer |JavaDoc| Pas tout à fait vrai. Données loadées de "Dap Server" (qui lui les charge, entre autre, de Google)
  * Load data from google service.
  *
  * @author Michel BARRAT && Thomas TAVERNIER
@@ -224,11 +225,13 @@ import org.apache.logging.log4j.Logger;
 public final class DataServer {
     /** Logs. */
     private static final Logger LOG = LogManager.getLogger("DataServer");
+    //TODO bam by Djer |JavaDoc| Cette partie de l'URL s'appel en général "host" (même si contient le protocol, puis l'hote, puis le port). Un nom plus "juste "est "root URL" ou "base URL" (ou parfois juste "base")
     /** Default URL of spring server. */
     private static final String URL = "http://localhost:8080";
     /** Default response time for query. */
     private static final int REPONSE_TIME = 15000;
 
+    //TODO bam by Djer |POO| Attention, il y a un chiffre "juste" **uniquement** après l'appel de "retrieveNextEvents()", l'aqppelant DOIT s'assurer que "retrieveNextEvents" est appelé avant de faire un "getNumberOfEvents" ce qui cré une "dépendance chronologique" assez risquée.
     /** number of events displaying. */
     private static Integer numberOfEvents = 0;
 
@@ -243,16 +246,17 @@ public final class DataServer {
      * Load data with try/catch exception.
      *
      * @param urlEnd URL to load from
-     * @return Data without exception
+     * @return Data without exception //TODO bam by Djer |JavaDoc| "Data" est un peu générique, "server response without exception" est plus précis. Précise que cela renvoie "error" si un PB se produit
      */
     public static String loadDataSafe(final String urlEnd) {
         URL url = null;
         String data = "error";
         try {
             url = new URL(URL + urlEnd);
+          //TODO bam by Djer |Log4J| Le level "Error" ne semble pas approrié. "Info" serait mieux.
             LOG.error("succes creating URL: " + URL + urlEnd);
         } catch (MalformedURLException e) {
-            LOG.error("error creating URL: \" + URL + urlEnd: ", e);
+            LOG.error("error creating URL: \"" + URL + urlEnd + "\"", e);
         }
         try {
             data = loadData(url);
@@ -291,12 +295,14 @@ public final class DataServer {
      *
      * @param userKey userKey to create
      */
+  //TODO bam by Djer |Rest API| Cette méthode ne devrait plus être utilsiée car remplacée par "newDapAccount" (si je comprend bien ton code)
     public static void newAccount(final String userKey) {
         URI account;
         Desktop browser = Desktop.getDesktop();
         try {
             account = new URI(URL + "/account/add/" + userKey);
             browser.browse(account);
+            //TODO bam by Djer |Log4J| Le level "Error" est innaproprié ici. "Info" serait mieux 
             LOG.error("succes creating URL for adding account for userkey \"" + userKey + "\"");
         } catch (URISyntaxException | IOException e) {
             LOG.error("error creating URL for adding account for userkey \"" + userKey + "\"", e);
@@ -349,12 +355,15 @@ public final class DataServer {
      * @param nb        number of event to retrieve
      * @return next events
      */
+    //TODO bam by Djer |POO| Cette méthode fait 2 choses, retourner la liste des evennments ET mettre à jour le nombre d'évènnements. 
     public static String[] retrieveNextEvents(final String loginName, final Integer nb) {
         String events;
         String[] eventsList;
         events = loadDataSafe("/allevent/next?loginName=" + loginName + "&nb=" + nb);
+      //TODO bam by Djer |POO| Plante si pas d'évènnemnt à venir et/ou Comtpe "Google" mal connecté au loginName
         events = events.substring(2, events.length() - 2);
         eventsList = events.split("\",\"");
+        //TODO bam by Djer |POO| Evite d'avoir un état dans une classe de "service", surtout en static ! Ici le risque est faible car tu es dans un client "mono-utilisateur", mais c'est une mauvaise habitude. Un processus pourrait lire le "numberOfEvent" pendant qu'un autre fait la requete de mise à jour (changement de userKey par exemple) et tu auras, par moment, un résultat inconcistent, voir faux !
         numberOfEvents = eventsList.length;
         return eventsList;
     }
@@ -368,6 +377,7 @@ public final class DataServer {
         loadDataSafe("/dap/createUser?loginName=" + loginName);
     }
 
+    //TODO bam by Djer |POO| Attention, nos Web Services sont "stateLess", le "user" n'a PAS à se "connecter". Le "userKey" DOIT etre renvoyé avec CHAQUE requetes, c'est au client de "sauvegarder" pour quel "userKey" il fait les requetes
     /**
      * Set google accounts for dap account.
      *
@@ -375,6 +385,7 @@ public final class DataServer {
      * @param loginName of dap account
      */
     public static void setAccount(final String userKey, final String loginName) {
+      //TODO bam by Djer |Rest API| Le "add" devrait afficher le navigateur pour permettre la selection de mon "compte Google" et devrait donc ouvrir le naviguateur de l'utilsiateur
         loadDataSafe("/dap/add/" + userKey + "?loginName=" + loginName);
     }
 

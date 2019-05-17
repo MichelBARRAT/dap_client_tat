@@ -257,6 +257,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         Object source = evt.getSource();
         if (source == buttonOption) {
             Options options = new Options();
+          //TODO bam by Djer |POO| Un peu étrange que "menu" passe un de ces bouton pour que "option" puisse ensuite "simuler" un clique dessus. Design Pattern Obeserver ?
             options.setRefresh(buttonRefresh);
         }
         if (source == buttonAccount) {

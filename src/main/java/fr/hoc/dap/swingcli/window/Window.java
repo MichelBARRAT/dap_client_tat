@@ -216,6 +216,7 @@ import fr.hoc.dap.swingcli.DataServer;
  *
  * @author Michel BARRAT && Thomas TAVERNIER
  */
+//TODO bam by Djer |POO| Nom pas top "DapMainWindow" serait mieux ? 
 public class Window extends JFrame implements ActionListener {
     /** serialVersionUID. */
     private static final long serialVersionUID = 6212387842969434386L;

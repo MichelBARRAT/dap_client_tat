@@ -241,13 +241,14 @@ public class EmailPanel extends JPanel {
      * Refresh email panel data.
      */
     public void refreshPanel() {
-        nbUnread = DataServer.retrieveTotalNbUnreadEmails(Pref.getUserName()).toString();
+        nbUnread = DataServer.retrieveNbUnreadEmails(Pref.getUserName()).toString();
         displayNbUnreadEmail.setText(nbUnread);
     }
 
     /**
      * Set text as "error".
      */
+    //TODO bam by Djer |POO| "displayError" serait mieux ?
     public void error() {
         displayNbUnreadEmail.setText("error");
     }

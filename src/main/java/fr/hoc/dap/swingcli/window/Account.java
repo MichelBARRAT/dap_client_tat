@@ -222,6 +222,7 @@ import fr.hoc.dap.swingcli.DataServer;
  *
  * @author Michel BARRAT && Thomas TAVERNIER
  */
+//TODO bam by Djer |POO| "AccountWindow" serait mieux ?
 public class Account extends JFrame implements ActionListener, KeyListener {
     /** SerialVersionUID. */
     private static final long serialVersionUID = -5208178832302630328L;
@@ -236,6 +237,7 @@ public class Account extends JFrame implements ActionListener, KeyListener {
     private JButton buttonConnection;
     /** Button for creating a new account. */
     private JButton buttonNewAccount;
+    //TODO bam by Djer |POO| "accountNameField" Serait mieux ? Ca ne semble pas/plus être un "area".
     /** Text field for entering an account. */
     private JTextField textArea;
     /** Panel of buttons. */

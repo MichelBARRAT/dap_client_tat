@@ -222,6 +222,7 @@ import fr.hoc.dap.swingcli.DataServer;
  *
  * @author Michel BARRAT && Thomas TAVERNIER
  */
+//TODO bam by Djer |POO| "OptionWindow" serait mieux ?
 public class Options extends JFrame implements ActionListener, KeyListener {
     /** serialVersionUID. */
     private static final long serialVersionUID = -252260295277564898L;

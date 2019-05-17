@@ -215,6 +215,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class Pref {
     /** Logs. */
+    //TODO bam by Djer |Log4J| Il vaut mieux utitliser le nom pleinnement qualifié de la classe comme "category" ; Avec log4J s'il n'y a pas de paramètres il utilisera automatiquement le nom pleinnement qualifié de la classe.
     private static final Logger LOG = LogManager.getLogger("Preferences");
     /** Default user name. */
     private static final String USER_NAME = "user name";
@@ -237,6 +238,7 @@ public final class Pref {
      */
     protected static void setUserName(final String userName) {
         PREFS.put(USER_NAME, userName);
+        //TODO bam by Djer |Log4J| "Error" semble innaproprié, "Info" serait mieux.
         LOG.error("User name set to: \"" + userName + "\"");
     }
 
@@ -257,6 +259,7 @@ public final class Pref {
      */
     protected static String getUserName() {
         String userName = PREFS.get(USER_NAME, "No_user_Name_save");
+        //TODO bam by Djer |Log4J| "Error" semble innaproprié, "Info" serait mieux.
         LOG.error("User name get: \"" + userName + "\"");
         return userName;
     }
@@ -267,7 +270,8 @@ public final class Pref {
      * @return number of next event
      */
     protected static Integer getNumberOfNextEvents() {
-        Integer numberOfNextEvents = PREFS.getInt(NUMBER_OF_NEXT_EVENTS, 1);
+        Integer numberOfNextEvents = PREFS.getInt(NUMBER_OF_NEXT_EVENTS, 1);*
+      //TODO bam by Djer |Log4J| "Eror" semble innaproprié, "Info" serait mieux.
         LOG.error("Number of next events get: \"" + numberOfNextEvents + "\"");
         return numberOfNextEvents;
     }

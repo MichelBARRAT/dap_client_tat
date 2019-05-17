@@ -262,7 +262,7 @@ public class EventPanel extends JPanel {
      */
     public void refreshPanel() {
         listModel.clear();
-        for (String x : DataServer.retrieveTotalNextEvents(Pref.getUserName(), Pref.getNumberOfNextEvents())) {
+        for (String x : DataServer.retrieveNextEvents(Pref.getUserName(), Pref.getNumberOfNextEvents())) {
             listModel.addElement(x);
         }
     }
@@ -270,6 +270,7 @@ public class EventPanel extends JPanel {
     /**
      * Set text as "error".
      */
+    //TODO bam by Djer |POO| "displayError" serait mieux ?
     public void error() {
         listModel.clear();
         listModel.addElement("error");
